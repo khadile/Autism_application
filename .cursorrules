@@ -1,0 +1,89 @@
+# Cursor Project Rules for BuddyBot
+
+project_name: BuddyBot
+
+coding_style: 
+  - Follow accessibility best practices (WCAG 2.1 AA)
+  - Use semantic HTML/ARIA labels where needed
+  - Keep colors & contrast accessible (sky blue & white palette)
+  - Minimum touch target size of 44x44dp
+  - Use clear, simple language in UI text
+  - Provide haptic feedback for interactions
+
+architecture:
+  - React Native with Expo
+  - Modular components structure
+  - AI logic in separate service/helper files
+  - Local storage for user progress
+  - Offline-first approach
+
+ui_guidelines:
+  - Fun but minimalistic UI design
+  - Rounded cards & buttons (minimum 8px border radius)
+  - Avatar is customizable & always visible in chat screen
+  - Activities laid out in scrollable grid
+  - Sky blue (#87CEEB) primary color
+  - White (#FFFFFF) backgrounds
+  - Dark blue (#1E3A8A) for text
+  - Green (#10B981) for positive feedback
+  - Soft red (#F87171) for alerts (used sparingly)
+
+interaction_guidelines:
+  - AI bot should never overwhelm user
+  - Big buttons & one question per screen in onboarding
+  - Activities should give immediate positive feedback
+  - Support both text and voice input
+  - Visual cues for all interactions
+  - Consistent navigation patterns
+
+file_structure:
+  - /components (reusable UI components)
+  - /screens (main app screens)
+  - /services (AI, storage, utilities)
+  - /assets (icons, animations, fonts)
+  - /docs (PRD, content map, etc.)
+  - /constants (colors, dimensions, content)
+  - /hooks (custom React hooks)
+  - /types (TypeScript definitions)
+
+ai_integration:
+  - Stub/mock AI responses during MVP development
+  - Include hooks for real backend or GPT API later
+  - Responses should be age-appropriate and supportive
+  - Never use complex vocabulary for younger users
+
+accessibility_requirements:
+  - Screen reader support
+  - High contrast mode support
+  - Reduce motion options
+  - Clear focus indicators
+  - Simple navigation structure
+  - Consistent UI patterns
+
+development_process:
+  - Follow docs/Development-Tasks.md for implementation priorities
+  - Start with Phase 1: Foundation (Weeks 1-4) tasks
+  - Complete Sprint 1 before moving to Sprint 2
+  - Focus on MVP features first (marked as P0 in tasks)
+  - Update relevant documentation as implementation progresses
+
+documentation_updates:
+  - Update Development-Tasks.md to mark completed tasks with ✅
+  - Add implementation notes to PRD.md when features are complete
+  - Update UI-Implementation-Summary.md with new components
+  - Create technical documentation for new services/utilities
+  - Keep wireframes current with actual implementation
+
+commit_guidelines:
+  - Write descriptive commit messages
+  - Keep PRs small & focused
+  - Include accessibility testing notes
+  - Test on both iOS and Android
+  - Reference Development-Tasks.md task numbers in commits
+
+testing_requirements:
+  - Test with screen readers
+  - Test with large fonts
+  - Test with reduced motion
+  - Test offline functionality
+  - User testing with target demographic 
