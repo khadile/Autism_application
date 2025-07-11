@@ -1,681 +1,503 @@
-# BuddyBot - API & Data Flow Diagram
+# BuddyBot - API & Data Flow Architecture
 
-## 🗺️ System Architecture Overview
+## 🏗️ **Storage Architecture Overview**
 
-BuddyBot is designed as an offline-first mobile application with optional cloud synchronization for enhanced features. The architecture prioritizes privacy, accessibility, and consistent performance for autistic users.
+### **Hybrid Local-First + Cloud Sync Design**
 
----
-
-## 🏗️ High-Level Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    BuddyBot Mobile App                     │
-│                                                             │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐ │
-│  │  Presentation   │  │   Business      │  │    Data     │ │
-│  │     Layer       │  │     Logic       │  │   Layer     │ │
-│  │                 │  │                 │  │             │ │
-│  │ • Screens       │  │ • AI Service    │  │ • SQLite    │ │
-│  │ • Components    │  │ • Activities    │  │ • AsyncStorage│ │
-│  │ • Navigation    │  │ • Progress      │  │ • File System│ │
-│  │                 │  │ • Avatar        │  │             │ │
-│  └─────────────────┘  └─────────────────┘  └─────────────┘ │
-│                                                             │
-│  ┌─────────────────────────────────────────────────────────┐ │
-│  │                Optional Cloud Services                  │ │
-│  │                                                         │ │
-│  │ • Progress Sync    • Content Updates   • AI Enhancement│ │
-│  │ • Backup/Restore   • Analytics         • Community     │ │
-│  └─────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-```
+BuddyBot uses a **local-first architecture** with **cloud synchronization** to ensure:
+- ✅ Full offline functionality for autism users
+- ✅ Multi-device data consistency  
+- ✅ Privacy-compliant cloud backup
+- ✅ No interruptions during therapeutic activities
 
 ---
 
-## 📊 Data Flow Patterns
+## 📊 **Data Storage Layers**
 
-### 1. User Onboarding Flow
+### **Layer 1: Local SQLite Database (Primary)**
 
-```
-User Opens App
-     ↓
-Check First Launch
-     ↓
-[New User] → Create Profile
-     ↓
-Avatar Creation
-     ↓
-Goal Setting
-     ↓
-Accessibility Preferences
-     ↓
-Save to Local Storage
-     ↓
-Initialize Home Screen
-
-Data Stored:
-- User preferences
-- Avatar configuration
-- Learning goals
-- Accessibility settings
-```
-
-### 2. Activity Flow
-
-```
-User Selects Activity
-     ↓
-Load Activity Data (Local)
-     ↓
-Present Activity Interface
-     ↓
-User Interactions
-     ↓
-Track Progress Locally
-     ↓
-Calculate Scores
-     ↓
-Update Progress Database
-     ↓
-Check Badge Criteria
-     ↓
-Award Badges (if earned)
-     ↓
-Display Feedback
-     ↓
-[Optional] Sync to Cloud
-
-Data Stored:
-- Activity responses
-- Completion times
-- Scores and progress
-- Badge achievements
-- Session metadata
-```
-
-### 3. AI Companion Flow
-
-```
-User Sends Message
-     ↓
-Parse Input (Text/Voice)
-     ↓
-Process with AI Service
-     ↓
-Generate Response
-     ↓
-Check for Activity Suggestions
-     ↓
-Format Response
-     ↓
-Display to User
-     ↓
-Log Conversation
-     ↓
-Update User Context
-
-Data Stored:
-- Conversation history
-- User mood/state
-- Response quality
-- Context information
-```
-
----
-
-## 🗄️ Data Models
-
-### User Profile
-```typescript
-interface UserProfile {
-  id: string;
-  username: string;
-  age_range: '6-12' | '13-18' | '19-24';
-  created_at: Date;
-  updated_at: Date;
-  preferences: UserPreferences;
-  avatar: AvatarConfiguration;
-  goals: LearningGoal[];
-}
-
-interface UserPreferences {
-  voice_enabled: boolean;
-  sound_enabled: boolean;
-  haptic_enabled: boolean;
-  reduced_motion: boolean;
-  high_contrast: boolean;
-  font_size: 'small' | 'medium' | 'large' | 'extra_large';
-  language: string;
-  communication_style: 'text' | 'voice' | 'both';
-}
-
-interface AvatarConfiguration {
-  base_character: string;
-  hair_style: string;
-  clothing: string;
-  accessories: string[];
-  colors: {
-    hair: string;
-    skin: string;
-    clothes: string;
-  };
-  expressions: string[];
-  backgrounds: string[];
-}
-```
-
-### Activity Data
-```typescript
-interface Activity {
-  id: string;
-  type: 'flashcards' | 'roleplay' | 'breathing' | 'story';
-  title: string;
-  description: string;
-  age_range: string[];
-  difficulty: 'easy' | 'medium' | 'hard';
-  content: ActivityContent;
-  completion_criteria: CompletionCriteria;
-}
-
-interface ActivitySession {
-  id: string;
-  user_id: string;
-  activity_id: string;
-  started_at: Date;
-  completed_at: Date | null;
-  responses: ActivityResponse[];
-  score: number;
-  completed: boolean;
-}
-
-interface ActivityResponse {
-  question_id: string;
-  user_response: string;
-  correct_answer: string;
-  is_correct: boolean;
-  response_time: number;
-  attempts: number;
-}
-```
-
-### Progress Tracking
-```typescript
-interface ProgressData {
-  user_id: string;
-  skill_area: 'social' | 'emotional' | 'communication' | 'self_regulation';
-  current_level: number;
-  total_activities: number;
-  completed_activities: number;
-  average_score: number;
-  last_activity_date: Date;
-  streak_count: number;
-  badges_earned: Badge[];
-}
-
-interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  earned_at: Date;
-  category: 'progress' | 'skill' | 'consistency' | 'special';
-}
-```
-
----
-
-## 🔧 Service Layer Architecture
-
-### AI Service
-```typescript
-class AIService {
-  // Local AI processing for basic responses
-  async processMessage(message: string, context: UserContext): Promise<AIResponse> {
-    // Rule-based response generation
-    // Mood analysis
-    // Activity suggestions
-    // Context awareness
-  }
-
-  // Optional cloud AI for advanced features
-  async enhancedProcessing(message: string): Promise<AIResponse> {
-    // Advanced NLP
-    // Personalized responses
-    // Learning adaptation
-  }
-}
-
-interface AIResponse {
-  text: string;
-  suggested_activities: string[];
-  mood_assessment: MoodLevel;
-  follow_up_questions: string[];
-  emotion_detection: EmotionType;
-}
-```
-
-### Activity Service
-```typescript
-class ActivityService {
-  async loadActivity(activityId: string): Promise<Activity> {
-    // Load from local storage
-    // Adapt to user preferences
-    // Apply accessibility settings
-  }
-
-  async saveProgress(session: ActivitySession): Promise<void> {
-    // Save to local database
-    // Update progress metrics
-    // Check badge criteria
-    // Trigger celebrations
-  }
-
-  async generateReport(timeframe: string): Promise<ProgressReport> {
-    // Analyze local data
-    // Generate insights
-    // Create visualizations
-  }
-}
-```
-
-### Avatar Service
-```typescript
-class AvatarService {
-  async updateAvatar(changes: Partial<AvatarConfiguration>): Promise<void> {
-    // Validate changes
-    // Check unlock status
-    // Save to local storage
-    // Update UI
-  }
-
-  async unlockItems(badges: Badge[]): Promise<string[]> {
-    // Check unlock criteria
-    // Award new items
-    // Notify user
-    // Update available items
-  }
-}
-```
-
----
-
-## 💾 Local Storage Strategy
-
-### SQLite Database Schema
+**Purpose**: Core data storage, offline-first, immediate access
 
 ```sql
--- User Profile Table
-CREATE TABLE users (
-  id TEXT PRIMARY KEY,
-  username TEXT NOT NULL,
-  age_range TEXT NOT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  preferences TEXT, -- JSON
-  avatar_config TEXT, -- JSON
-  goals TEXT -- JSON
+-- User Profile with sync metadata
+CREATE TABLE user_profile (
+  id TEXT PRIMARY KEY,           -- UUID for cloud sync
+  user_id TEXT,                  -- Cloud user account ID
+  created_at DATETIME,
+  updated_at DATETIME,
+  synced_at DATETIME,            -- Last successful sync
+  sync_status TEXT DEFAULT 'pending', -- 'synced', 'pending', 'conflict'
+  avatar_config TEXT,            -- JSON: customization data
+  accessibility_preferences TEXT -- JSON: user accessibility settings
 );
 
--- Activity Sessions Table
+-- Activity Sessions with sync support
 CREATE TABLE activity_sessions (
-  id TEXT PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  activity_id TEXT NOT NULL,
-  started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  id TEXT PRIMARY KEY,           -- UUID
+  user_id TEXT,
+  activity_type TEXT,            -- 'social_flashcards', 'breathing', etc.
   completed_at DATETIME,
-  responses TEXT, -- JSON
   score INTEGER,
-  completed BOOLEAN DEFAULT FALSE,
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  time_spent INTEGER,            -- Seconds
+  difficulty_level INTEGER,      -- 1-5 scale
+  emotional_state_before TEXT,   -- Pre-activity mood
+  emotional_state_after TEXT,    -- Post-activity mood
+  device_id TEXT,               -- Which device created this
+  created_at DATETIME,
+  updated_at DATETIME,
+  synced_at DATETIME,
+  sync_status TEXT DEFAULT 'pending'
 );
 
--- Progress Tracking Table
-CREATE TABLE progress (
+-- Skill Progress Tracking
+CREATE TABLE skill_progress (
   id TEXT PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  skill_area TEXT NOT NULL,
-  current_level INTEGER DEFAULT 1,
-  total_activities INTEGER DEFAULT 0,
-  completed_activities INTEGER DEFAULT 0,
-  average_score REAL DEFAULT 0,
-  last_activity_date DATETIME,
-  streak_count INTEGER DEFAULT 0,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  user_id TEXT,
+  skill_category TEXT,           -- 'social_skills', 'emotions', 'communication', 'self_regulation'
+  progress_percentage REAL,      -- 0.0 to 100.0
+  milestone_reached TEXT,        -- Latest milestone achieved
+  last_updated DATETIME,
+  assessment_data TEXT,          -- JSON: detailed progress metrics
+  device_id TEXT,
+  created_at DATETIME,
+  updated_at DATETIME,
+  synced_at DATETIME,
+  sync_status TEXT DEFAULT 'pending'
 );
 
--- Badges Table
-CREATE TABLE badges (
+-- AI Chat History (Encrypted for cloud)
+CREATE TABLE chat_messages (
   id TEXT PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  badge_type TEXT NOT NULL,
-  name TEXT NOT NULL,
-  description TEXT,
-  icon TEXT,
-  earned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  category TEXT,
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  user_id TEXT,
+  message_text TEXT,            -- Encrypted before cloud sync
+  is_bot_message BOOLEAN,
+  timestamp DATETIME,
+  mood_context TEXT,            -- User's mood during conversation
+  activity_context TEXT,        -- Related activity if applicable
+  conversation_session_id TEXT, -- Group related messages
+  device_id TEXT,
+  created_at DATETIME,
+  synced_at DATETIME,
+  sync_status TEXT DEFAULT 'pending'
 );
 
--- Conversation History Table
-CREATE TABLE conversations (
+-- Achievement System
+CREATE TABLE achievements (
   id TEXT PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  message TEXT NOT NULL,
-  response TEXT NOT NULL,
-  mood_assessment TEXT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  user_id TEXT,
+  badge_type TEXT,              -- 'first_activity', 'week_streak', etc.
+  badge_category TEXT,          -- 'participation', 'progress', 'consistency'
+  earned_at DATETIME,
+  activity_trigger TEXT,        -- What activity triggered this badge
+  device_id TEXT,
+  synced_at DATETIME,
+  sync_status TEXT DEFAULT 'pending'
+);
+
+-- Detailed Activity Results
+CREATE TABLE flashcard_results (
+  id TEXT PRIMARY KEY,
+  session_id TEXT,              -- Links to activity_sessions
+  emotion_type TEXT,            -- 'happy', 'sad', 'angry', etc.
+  emotion_shown TEXT,           -- Image/scenario shown
+  user_response TEXT,           -- User's answer
+  correct BOOLEAN,
+  response_time INTEGER,        -- Milliseconds
+  confidence_level INTEGER,     -- 1-5 if user provides
+  completed_at DATETIME,
+  device_id TEXT,
+  synced_at DATETIME,
+  sync_status TEXT DEFAULT 'pending'
+);
+
+-- Breathing Exercise Data
+CREATE TABLE breathing_sessions (
+  id TEXT PRIMARY KEY,
+  session_id TEXT,              -- Links to activity_sessions
+  breathing_pattern TEXT,       -- 'box', 'triangle', 'custom'
+  duration_seconds INTEGER,
+  stress_level_before INTEGER,  -- 1-10 scale
+  stress_level_after INTEGER,   -- 1-10 scale
+  completed_successfully BOOLEAN,
+  device_id TEXT,
+  synced_at DATETIME,
+  sync_status TEXT DEFAULT 'pending'
 );
 ```
 
-### AsyncStorage Usage
+### **Layer 2: AsyncStorage (Quick Access)**
 
-```typescript
-// User preferences and settings
+**Purpose**: Immediate access data, user preferences, session state
+
+```javascript
 const STORAGE_KEYS = {
-  USER_PREFERENCES: '@BuddyBot:preferences',
-  AVATAR_CONFIG: '@BuddyBot:avatar',
-  ONBOARDING_COMPLETE: '@BuddyBot:onboarding',
-  LAST_BACKUP: '@BuddyBot:last_backup',
-  ACCESSIBILITY_SETTINGS: '@BuddyBot:accessibility',
-  CONTENT_VERSION: '@BuddyBot:content_version'
+  // Authentication & Sync
+  USER_ID: 'user_id',
+  AUTH_TOKEN: 'auth_token',
+  DEVICE_ID: 'device_id',
+  LAST_SYNC_TIMESTAMP: 'last_sync_timestamp',
+  SYNC_ENABLED: 'sync_enabled',
+  OFFLINE_CHANGES_COUNT: 'offline_changes_count',
+  
+  // User Preferences (Synced to Cloud)
+  ACCESSIBILITY_SETTINGS: 'accessibility_settings',
+  /*
+  {
+    fontSize: 'large',
+    highContrast: true,
+    reducedMotion: false,
+    voiceEnabled: true,
+    hapticFeedback: true,
+    screenReaderEnabled: false
+  }
+  */
+  
+  THEME_PREFERENCES: 'theme_preferences',
+  /*
+  {
+    primaryColor: '#87CEEB',
+    darkMode: false,
+    customColors: false
+  }
+  */
+  
+  AVATAR_CONFIG: 'avatar_config',
+  /*
+  {
+    bodyType: 'robot',
+    color: '#87CEEB',
+    accessories: ['hat', 'glasses'],
+    name: 'Buddy',
+    expressions: ['happy', 'encouraging']
+  }
+  */
+  
+  // App State
+  ONBOARDING_COMPLETED: 'onboarding_completed',
+  SELECTED_GOALS: 'selected_goals', // ['social_skills', 'emotions']
+  CURRENT_SESSION: 'current_session',
+  /*
+  {
+    lastActiveScreen: 'home',
+    botGreetingShown: true,
+    dailyCheckInCompleted: false,
+    currentStreak: 5
+  }
+  */
+  
+  // Quick Access Data
+  SUGGESTED_ACTIVITIES: 'suggested_activities',
+  RECENT_ACHIEVEMENTS: 'recent_achievements',
+  LAST_COMPLETED_ACTIVITY: 'last_completed_activity'
 };
+```
 
-class StorageService {
-  async saveUserPreferences(preferences: UserPreferences): Promise<void> {
-    await AsyncStorage.setItem(
-      STORAGE_KEYS.USER_PREFERENCES,
-      JSON.stringify(preferences)
-    );
-  }
+### **Layer 3: Cloud Storage (Backup & Sync)**
 
-  async getUserPreferences(): Promise<UserPreferences | null> {
-    const data = await AsyncStorage.getItem(STORAGE_KEYS.USER_PREFERENCES);
-    return data ? JSON.parse(data) : null;
-  }
-}
+**Purpose**: Multi-device sync, data backup, parental dashboard
+
+```sql
+-- Cloud Database Schema
+
+-- User Accounts (COPPA Compliant)
+CREATE TABLE users (
+  id UUID PRIMARY KEY,
+  created_at TIMESTAMP,
+  guardian_email TEXT,          -- Required for users under 13
+  age_group TEXT,               -- '6-12', '13-18', '19-24'
+  subscription_type TEXT,       -- 'free', 'premium'
+  data_retention_days INTEGER DEFAULT 365,
+  parental_consent BOOLEAN DEFAULT false,
+  consent_date TIMESTAMP
+);
+
+-- Device Management
+CREATE TABLE user_devices (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  device_id TEXT UNIQUE,
+  device_name TEXT,
+  platform TEXT,               -- 'ios', 'android'
+  app_version TEXT,
+  last_sync TIMESTAMP,
+  active BOOLEAN DEFAULT true
+);
+
+-- Replicated Local Tables (Cloud Versions)
+CREATE TABLE activity_sessions_cloud (
+  -- Same structure as local table
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  -- ... all local fields ...
+  cloud_created_at TIMESTAMP,
+  last_modified_device TEXT,
+  conflict_resolution TEXT,     -- For multi-device conflicts
+  data_hash TEXT               -- For integrity verification
+);
+
+-- Sync Metadata
+CREATE TABLE sync_operations (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  device_id TEXT,
+  operation_type TEXT,         -- 'push', 'pull', 'conflict_resolution'
+  table_name TEXT,
+  record_count INTEGER,
+  started_at TIMESTAMP,
+  completed_at TIMESTAMP,
+  status TEXT,                 -- 'success', 'failed', 'partial'
+  error_details TEXT
+);
 ```
 
 ---
 
-## 🌐 Optional Cloud Services
+## 🔄 **Data Flow & Synchronization**
 
-### Data Synchronization
-```typescript
-interface CloudSyncService {
-  // Backup user data
-  backup(userData: UserData): Promise<SyncResult>;
+### **1. App Startup Flow**
+
+```mermaid
+graph TD
+    A[App Launch] --> B[Load AsyncStorage]
+    B --> C[Initialize SQLite]
+    C --> D[Check Network]
+    D --> E{Online?}
+    E -->|Yes| F[Background Sync]
+    E -->|No| G[Offline Mode]
+    F --> H[App Ready]
+    G --> H[App Ready]
+    H --> I[Load Home Screen]
+```
+
+### **2. Activity Completion Flow**
+
+```mermaid
+graph TD
+    A[User Completes Activity] --> B[Store Results in SQLite]
+    B --> C[Update AsyncStorage State]
+    C --> D[Update Progress Calculations]
+    D --> E[Check for New Achievements]
+    E --> F[Show Immediate Feedback]
+    F --> G{Online?}
+    G -->|Yes| H[Queue for Sync]
+    G -->|No| I[Mark as Pending Sync]
+    H --> J[Background Sync Service]
+    I --> J
+```
+
+### **3. Cloud Sync Strategy**
+
+```javascript
+// Sync Service Implementation
+class CloudSyncManager {
   
-  // Restore user data
-  restore(userId: string): Promise<UserData>;
-  
-  // Sync progress across devices
-  syncProgress(progress: ProgressData[]): Promise<SyncResult>;
-  
-  // Check for content updates
-  checkContentUpdates(): Promise<ContentUpdate[]>;
-}
-
-interface SyncResult {
-  success: boolean;
-  timestamp: Date;
-  conflicts: SyncConflict[];
-  errors: string[];
-}
-```
-
-### Analytics Service
-```typescript
-interface AnalyticsService {
-  // Anonymous usage analytics
-  trackActivityCompletion(activityType: string, duration: number): Promise<void>;
-  
-  // Feature usage tracking
-  trackFeatureUsage(feature: string, context: string): Promise<void>;
-  
-  // Performance metrics
-  trackPerformanceMetrics(metrics: PerformanceData): Promise<void>;
-  
-  // Privacy-preserving analytics
-  anonymizeData(data: any): Promise<AnonymizedData>;
-}
-```
-
----
-
-## 🔄 Data Flow Scenarios
-
-### Scenario 1: Daily Check-In
-```
-1. User opens app
-2. AI companion greets user
-3. User selects mood (stored locally)
-4. AI suggests activities based on mood
-5. User selects activity
-6. Activity data loaded from local storage
-7. User completes activity
-8. Progress updated in local database
-9. Badges checked and awarded
-10. Celebration shown
-11. Data optionally synced to cloud
-```
-
-### Scenario 2: Avatar Customization
-```
-1. User navigates to avatar screen
-2. Current avatar config loaded from storage
-3. User selects new item
-4. System checks if item is unlocked
-5. If unlocked, apply changes
-6. Save new configuration locally
-7. Update avatar across app
-8. Show success feedback
-9. Sync changes to cloud (optional)
-```
-
-### Scenario 3: Progress Review
-```
-1. User accesses progress screen
-2. Query local database for recent activities
-3. Calculate progress metrics
-4. Generate progress visualizations
-5. Show achievements and badges
-6. Suggest next activities
-7. Allow detailed drill-down
-8. Export progress report (optional)
-```
-
----
-
-## 🛡️ Privacy & Security
-
-### Data Protection
-```typescript
-class DataProtectionService {
-  // Encrypt sensitive data
-  encrypt(data: string): string {
-    // Use device keychain/keystore
-    // AES-256 encryption
-    // Secure key management
-  }
-
-  // Anonymize user data
-  anonymize(data: UserData): AnonymizedData {
-    // Remove identifying information
-    // Hash sensitive fields
-    // Aggregate data points
-  }
-
-  // Secure data transmission
-  secureTransmit(data: any): Promise<void> {
-    // HTTPS only
-    // Certificate pinning
-    // Request signing
-  }
-}
-```
-
-### Privacy Controls
-```typescript
-interface PrivacySettings {
-  data_collection_enabled: boolean;
-  analytics_enabled: boolean;
-  cloud_sync_enabled: boolean;
-  data_retention_days: number;
-  parental_controls: ParentalControls;
-}
-
-interface ParentalControls {
-  enabled: boolean;
-  progress_sharing: boolean;
-  activity_restrictions: string[];
-  time_limits: TimeLimits;
-}
-```
-
----
-
-## 📱 Platform Integration
-
-### iOS Integration
-```typescript
-// iOS-specific features
-class iOSIntegration {
-  // HealthKit integration for wellness data
-  async shareWellnessData(data: WellnessData): Promise<void> {
-    // Optional wellness tracking
-    // Mood and activity correlation
-    // Privacy-first approach
-  }
-
-  // Shortcuts integration
-  async createShortcuts(): Promise<void> {
-    // Quick access to calm-down corner
-    // Voice-activated activities
-    // Siri integration
-  }
-}
-```
-
-### Android Integration
-```typescript
-// Android-specific features
-class AndroidIntegration {
-  // Accessibility services
-  async setupAccessibilityServices(): Promise<void> {
-    // TalkBack integration
-    // Switch navigation support
-    // Voice access compatibility
-  }
-
-  // Widget support
-  async createWidgets(): Promise<void> {
-    // Progress widget
-    // Quick activity access
-    // Mood check-in widget
-  }
-}
-```
-
----
-
-## 🔧 Development Tools
-
-### API Documentation
-```typescript
-// OpenAPI specification for future cloud services
-interface BuddyBotAPI {
-  '/api/v1/users': {
-    POST: (userData: UserData) => Promise<User>;
-    GET: (userId: string) => Promise<User>;
-    PUT: (userId: string, updates: Partial<UserData>) => Promise<User>;
+  // Sync Priority Levels
+  SYNC_PRIORITIES = {
+    HIGH: ['skill_progress', 'user_profile', 'achievements'],
+    MEDIUM: ['activity_sessions', 'chat_messages'],
+    LOW: ['flashcard_results', 'breathing_sessions']
   };
   
-  '/api/v1/activities': {
-    GET: (filters: ActivityFilters) => Promise<Activity[]>;
-    POST: (activityData: ActivityData) => Promise<Activity>;
-  };
-  
-  '/api/v1/progress': {
-    GET: (userId: string) => Promise<ProgressData[]>;
-    POST: (progressData: ProgressData) => Promise<void>;
-  };
-}
-```
-
-### Testing Strategy
-```typescript
-// Mock services for testing
-class MockAIService implements AIService {
-  async processMessage(message: string): Promise<AIResponse> {
-    // Predictable responses for testing
-    // Various scenario coverage
-    // Edge case handling
-  }
-}
-
-class MockStorageService implements StorageService {
-  private mockData: Map<string, any> = new Map();
-  
-  async save(key: string, data: any): Promise<void> {
-    this.mockData.set(key, data);
+  async performSync() {
+    try {
+      // 1. Authenticate and refresh token
+      await this.authenticateUser();
+      
+      // 2. Pull latest changes from cloud (high priority first)
+      const cloudChanges = await this.pullFromCloud();
+      await this.mergeCloudChanges(cloudChanges);
+      
+      // 3. Push local changes (handle conflicts)
+      const localChanges = await this.getUnsyncedLocalChanges();
+      const conflicts = await this.pushToCloud(localChanges);
+      
+      // 4. Resolve any conflicts
+      if (conflicts.length > 0) {
+        await this.resolveConflicts(conflicts);
+      }
+      
+      // 5. Update sync timestamps
+      await this.updateSyncStatus();
+      
+    } catch (error) {
+      console.log('Sync failed, queuing for retry:', error);
+      await this.queueSyncRetry();
+    }
   }
   
-  async load(key: string): Promise<any> {
-    return this.mockData.get(key);
+  // Conflict Resolution for Autism App
+  async resolveConflicts(conflicts) {
+    for (const conflict of conflicts) {
+      const resolution = this.getConflictResolution(conflict);
+      
+      switch (conflict.table) {
+        case 'activity_sessions':
+          // Keep all sessions, merge by timestamp
+          await this.mergeActivitySessions(conflict);
+          break;
+          
+        case 'skill_progress':
+          // Use highest progress value
+          await this.useHighestProgress(conflict);
+          break;
+          
+        case 'user_profile':
+          // Merge non-conflicting fields, prefer latest update
+          await this.mergeUserProfile(conflict);
+          break;
+          
+        default:
+          // Default: prefer most recent timestamp
+          await this.useLatestTimestamp(conflict);
+      }
+    }
   }
 }
 ```
 
 ---
 
-## 📊 Performance Considerations
+## 🔐 **Privacy & Security Architecture**
 
-### Optimization Strategies
-```typescript
-class PerformanceOptimizer {
-  // Lazy loading for activities
-  async loadActivityOnDemand(activityId: string): Promise<Activity> {
-    // Cache frequently used activities
-    // Preload based on user patterns
-    // Optimize for slow devices
-  }
+### **Data Classification & Encryption**
 
-  // Image optimization
-  async optimizeImages(): Promise<void> {
-    // WebP format support
-    // Multiple resolutions
-    // Lazy loading implementation
+```javascript
+const DATA_SECURITY_LEVELS = {
+  
+  // Level 1: Public (No encryption needed)
+  PUBLIC: {
+    tables: ['app_metadata'],
+    encryption: false,
+    cloudStorage: true,
+    parentalAccess: true
+  },
+  
+  // Level 2: Personal (Standard encryption)
+  PERSONAL: {
+    tables: ['user_profile', 'achievements', 'activity_sessions'],
+    encryption: 'AES-256',
+    cloudStorage: true,
+    parentalAccess: true  // For minors
+  },
+  
+  // Level 3: Sensitive (High encryption)
+  SENSITIVE: {
+    tables: ['chat_messages', 'emotional_data'],
+    encryption: 'AES-256-GCM',
+    cloudStorage: true,
+    parentalAccess: false, // Private to user
+    dataRetention: 90     // Days
+  },
+  
+  // Level 4: Device Only (No cloud)
+  DEVICE_ONLY: {
+    tables: ['temp_session_data', 'cache'],
+    encryption: false,
+    cloudStorage: false,
+    dataRetention: 1      // Days
   }
-
-  // Database optimization
-  async optimizeDatabase(): Promise<void> {
-    // Index optimization
-    // Query optimization
-    // Periodic cleanup
-  }
-}
+};
 ```
 
-### Monitoring & Alerting
-```typescript
-interface PerformanceMetrics {
-  app_start_time: number;
-  activity_load_time: number;
-  database_query_time: number;
-  memory_usage: number;
-  crash_reports: CrashReport[];
-}
+### **Authentication Flow for Autism Users**
 
-class PerformanceMonitor {
-  async trackMetrics(metrics: PerformanceMetrics): Promise<void> {
-    // Local performance tracking
-    // Anonymous reporting
-    // Performance regression detection
+```javascript
+// Simplified, accessible authentication
+const AUTH_METHODS = {
+  
+  // Primary: Simple PIN (autism-friendly)
+  DEVICE_PIN: {
+    type: 'numeric',
+    length: 4,
+    attempts: 5,
+    biometric: true,      // Optional fingerprint
+    visualFeedback: true, // Large buttons, clear feedback
+    description: 'Simple 4-digit code'
+  },
+  
+  // Secondary: Guardian email (for account recovery)
+  GUARDIAN_EMAIL: {
+    type: 'email',
+    purpose: 'recovery_only',
+    required: true,       // For users under 13
+    parentalConsent: true
+  },
+  
+  // Accessibility: Visual pattern (for non-verbal users)
+  VISUAL_PATTERN: {
+    type: 'pattern',
+    grid: '3x3',
+    colors: ['blue', 'green', 'yellow'],
+    shapes: ['circle', 'square', 'triangle'],
+    hapticFeedback: true
   }
-}
+};
 ```
 
-This comprehensive API and data flow design ensures BuddyBot provides a robust, privacy-focused, and scalable architecture while maintaining the offline-first approach essential for consistent user experience. 
+---
+
+## 📡 **API Endpoints**
+
+### **Cloud API Design**
+
+```javascript
+const API_ENDPOINTS = {
+  
+  // Authentication
+  REGISTER: 'POST /auth/register',
+  LOGIN: 'POST /auth/login',
+  REFRESH_TOKEN: 'POST /auth/refresh',
+  LOGOUT: 'POST /auth/logout',
+  
+  // Data Synchronization
+  SYNC_PULL: 'GET /sync/pull/:timestamp',
+  SYNC_PUSH: 'POST /sync/push',
+  SYNC_STATUS: 'GET /sync/status',
+  RESOLVE_CONFLICTS: 'POST /sync/resolve',
+  
+  // User Management
+  GET_PROFILE: 'GET /users/profile',
+  UPDATE_PROFILE: 'PUT /users/profile',
+  DELETE_ACCOUNT: 'DELETE /users/account',
+  
+  // Data Export (GDPR Compliance)
+  EXPORT_DATA: 'GET /data/export',
+  DATA_PORTABILITY: 'GET /data/download',
+  
+  // Parental Features (for minors)
+  PARENTAL_DASHBOARD: 'GET /parent/dashboard',
+  PROGRESS_REPORT: 'GET /parent/progress',
+  CONSENT_MANAGEMENT: 'POST /parent/consent',
+  
+  // Device Management
+  REGISTER_DEVICE: 'POST /devices/register',
+  LIST_DEVICES: 'GET /devices',
+  REVOKE_DEVICE: 'DELETE /devices/:deviceId'
+};
+```
+
+---
+
+## 🎯 **Offline-First Benefits for Autism Users**
+
+### **1. Predictable Experience**
+- App functions identically online/offline
+- No loading states during activities
+- Consistent performance regardless of connection
+
+### **2. Reduced Anxiety**
+- No network dependency for core features
+- Activities never interrupted by connectivity issues
+- Progress always saved locally first
+
+### **3. Privacy by Design**
+- Sensitive data encrypted on device
+- Minimal cloud data transmission
+- User controls what syncs to cloud
+
+### **4. Multi-Device Flexibility**
+- Seamless transition between devices
+- Progress syncs automatically when online
+- Consistent personalization everywhere
+
+This architecture ensures BuddyBot provides a reliable, secure, and autism-friendly experience while leveraging modern cloud capabilities for data backup and multi-device support. 

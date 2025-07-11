@@ -159,14 +159,48 @@ Grid-based interface with core activities:
 ### Performance Requirements
 - **Load Time**: < 3 seconds for app startup
 - **Response Time**: < 1 second for user interactions
-- **Offline Support**: Core activities available without internet
+- **Offline Support**: Full functionality available without internet
 - **Battery Usage**: Optimized for extended use sessions
+- **Sync Performance**: Background sync < 5 seconds for typical data
+
+### Data Architecture & Storage
+
+#### **Hybrid Local-First + Cloud Sync Design**
+- **Primary Storage**: SQLite database with sync metadata
+- **Quick Access**: AsyncStorage for preferences and session state  
+- **Cloud Backup**: Encrypted cloud storage for multi-device sync
+- **Offline-First**: App functions fully without internet connection
+- **Conflict Resolution**: Automatic handling of multi-device data conflicts
+
+#### **Data Privacy & Security**
+- **Local Encryption**: Sensitive data encrypted on device
+- **Cloud Encryption**: End-to-end encryption for cloud storage
+- **COPPA Compliance**: Special handling for users under 13
+- **Data Classification**: Tiered security based on data sensitivity
+- **Parental Controls**: Guardian access for minors' progress data
+
+#### **Multi-Device Support**
+- **Seamless Sync**: Progress syncs across devices when online
+- **Device Management**: Register and manage multiple devices per user
+- **Conflict Resolution**: Smart merging of data from different devices
+- **Consistent Experience**: Identical functionality across all devices
 
 ### Data & Privacy
-- **Local Storage**: User progress and preferences stored on device
-- **No Personal Data**: Minimal data collection, no sensitive information
-- **COPPA Compliance**: Designed for users under 13
+- **Local Storage**: Primary data storage on device for reliability
+- **Cloud Sync**: Optional backup and multi-device synchronization
+- **Minimal Data Collection**: Only essential data for app functionality
+- **No Personal Data**: No sensitive personal information collected
+- **COPPA Compliance**: Designed for users under 13 with parental consent
+- **Data Portability**: Easy export of user data (GDPR compliance)
 - **Parental Controls**: Optional monitoring and progress sharing features
+
+### Authentication & Security
+- **Simple Authentication**: 4-digit PIN or visual pattern for accessibility
+- **Biometric Support**: Optional fingerprint/face ID for convenience
+- **Guardian Email**: Required for account recovery (minors)
+- **Secure Storage**: Encrypted local storage for all sensitive data
+- **Session Management**: Automatic logout after inactivity
+- **Device Registration**: Secure device pairing and management
 
 ---
 
