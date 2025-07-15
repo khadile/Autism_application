@@ -7,7 +7,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { theme } from '../constants/theme';
+import { theme } from '../../constants/theme';
 
 const HomeScreen = () => {
   const [selectedSuggestion, setSelectedSuggestion] = useState<string | null>(null);
@@ -74,7 +74,7 @@ const HomeScreen = () => {
         <View style={styles.botAvatarSection}>
           <TouchableOpacity style={styles.customizeAvatarButton}>
             <View style={styles.botAvatar}>
-              <Text style={styles.botAvatarEmoji}>🤖</Text>
+              <Text style={styles.botAvatarEmoji} allowFontScaling={false}>🤖</Text>
             </View>
             <Text style={styles.customizeText}>Tap to customize</Text>
           </TouchableOpacity>
@@ -107,7 +107,7 @@ const HomeScreen = () => {
                 accessibilityLabel={`${suggestion.text} activity`}
                 accessibilityHint="Double tap to select this activity"
               >
-                <Text style={styles.suggestionIcon}>{suggestion.icon}</Text>
+                <Text style={styles.suggestionIcon} allowFontScaling={false}>{suggestion.icon}</Text>
                 <Text style={styles.suggestionText}>{suggestion.text}</Text>
               </TouchableOpacity>
             ))}
@@ -267,7 +267,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: theme.spacing.sm,
   },
   suggestionButton: {
     width: '48%',
@@ -279,6 +278,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
     minHeight: 100,
     justifyContent: 'center',
+    marginBottom: theme.spacing.sm,
     ...theme.shadows.sm,
   },
   selectedSuggestion: {
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primaryLight,
   },
   suggestionIcon: {
-    fontSize: theme.spacing.iconLarge,
+    fontSize: theme.typography.fontSize.xxl,
     marginBottom: theme.spacing.sm,
   },
   suggestionText: {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
@@ -7,14 +7,71 @@ import { Ionicons } from '@expo/vector-icons';
 import { View, Text } from 'react-native';
 
 // Import screens
-import HomeScreen from './src/screens/HomeScreen';
-import ActivitiesScreen from './src/screens/ActivitiesScreen';
+import { HomeScreen } from './src/screens/home';
+import { ActivitiesScreen } from './src/screens/activities';
+import { OnboardingNavigator } from './src/screens/onboarding';
+import { OnboardingService } from './src/services/OnboardingService';
 import { theme } from './src/constants/theme';
 
 // Create bottom tab navigator
 const Tab = createBottomTabNavigator();
 
 export default function App() {
+  const [isOnboardingComplete, setIsOnboardingComplete] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    checkOnboardingStatus();
+  }, []);
+
+  const checkOnboardingStatus = async () => {
+    try {
+      // Clear AsyncStorage to remove any old data that might cause fontSize errors
+      await OnboardingService.resetOnboarding();
+      
+      const isComplete = await OnboardingService.isOnboardingComplete();
+      setIsOnboardingComplete(isComplete);
+    } catch (error) {
+      console.error('Failed to check onboarding status:', error);
+      // Default to showing onboarding if we can't check
+      setIsOnboardingComplete(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOnboardingComplete = async () => {
+    try {
+      // Small delay to ensure all onboarding components are properly unmounted
+      await new Promise(resolve => setTimeout(resolve, 100));
+      setIsOnboardingComplete(true);
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+      setIsOnboardingComplete(true); // Still proceed to avoid getting stuck
+    }
+  };
+
+  if (isLoading) {
+    // Show loading screen while checking onboarding status
+    return (
+      <SafeAreaProvider>
+        <StatusBar style="dark" backgroundColor={theme.colors.background} />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.background }}>
+          <Text style={{ fontSize: 18, color: theme.colors.text }} allowFontScaling={false}>Loading...</Text>
+        </View>
+      </SafeAreaProvider>
+    );
+  }
+
+  if (!isOnboardingComplete) {
+    return (
+      <SafeAreaProvider>
+        <StatusBar style="dark" backgroundColor={theme.colors.background} />
+        <OnboardingNavigator onComplete={handleOnboardingComplete} />
+      </SafeAreaProvider>
+    );
+  }
+
   return (
     <SafeAreaProvider>
       <NavigationContainer>
@@ -37,44 +94,40 @@ export default function App() {
               return <Ionicons name={iconName} size={size} color={color} />;
             },
             tabBarActiveTintColor: theme.colors.primary,
-            tabBarInactiveTintColor: theme.colors.textLight,
+            tabBarInactiveTintColor: theme.colors.textMuted,
             tabBarStyle: {
               backgroundColor: theme.colors.background,
               borderTopColor: theme.colors.border,
-              borderTopWidth: 1,
-              height: 60,
               paddingBottom: 8,
               paddingTop: 8,
+              height: 70,
             },
             tabBarLabelStyle: {
               fontSize: theme.typography.fontSize.sm,
               fontWeight: theme.typography.fontWeight.medium,
             },
-            headerShown: false, // We'll handle headers in individual screens
+            headerShown: false,
           })}
         >
           <Tab.Screen 
             name="Home" 
-            component={HomeScreen}
+            component={HomeScreen} 
             options={{
-              title: 'Home',
-              tabBarAccessibilityLabel: 'Home tab',
+              tabBarLabel: 'Home',
             }}
           />
           <Tab.Screen 
             name="Activities" 
-            component={ActivitiesScreen}
+            component={ActivitiesScreen} 
             options={{
-              title: 'Activities',
-              tabBarAccessibilityLabel: 'Activities tab',
+              tabBarLabel: 'Activities',
             }}
           />
           <Tab.Screen 
             name="Profile" 
-            component={ProfileScreen}
+            component={ProfileScreen} 
             options={{
-              title: 'Profile',
-              tabBarAccessibilityLabel: 'Profile tab',
+              tabBarLabel: 'Profile',
             }}
           />
         </Tab.Navigator>
@@ -83,27 +136,21 @@ export default function App() {
   );
 }
 
-// Placeholder ProfileScreen component
 const ProfileScreen = () => {
   return (
-    <View style={{
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: theme.colors.background,
-    }}>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.background }}>
       <Text style={{
         fontSize: theme.typography.fontSize.lg,
         color: theme.colors.text,
-        fontWeight: theme.typography.fontWeight.medium,
-      }}>
+        fontWeight: theme.typography.fontWeight.medium
+      }} allowFontScaling={false}>
         Profile Screen
       </Text>
       <Text style={{
         fontSize: theme.typography.fontSize.md,
         color: theme.colors.textLight,
-        marginTop: theme.spacing.sm,
-      }}>
+        marginTop: 8
+      }} allowFontScaling={false}>
         Coming soon...
       </Text>
     </View>

@@ -59,9 +59,9 @@ const PersistentBotChat: React.FC<PersistentBotChatProps> = ({
           accessibilityRole="button"
         >
           <View style={styles.headerContent}>
-            <Text style={styles.botIcon}>🤖</Text>
+            <Text style={styles.botIcon} allowFontScaling={false}>🤖</Text>
             <Text style={styles.headerText}>Chat with Buddy</Text>
-            <Text style={styles.expandIcon}>
+            <Text style={styles.expandIcon} allowFontScaling={false}>
               {isExpanded ? '↓' : '↑'}
             </Text>
           </View>
@@ -73,7 +73,7 @@ const PersistentBotChat: React.FC<PersistentBotChatProps> = ({
             {/* Bot Message */}
             <View style={styles.messageContainer}>
               <View style={styles.botMessage}>
-                <Text style={styles.botIcon}>🤖</Text>
+                <Text style={styles.botIcon} allowFontScaling={false}>🤖</Text>
                 <Text style={styles.botText}>
                   Need help choosing an activity? I can help!
                 </Text>
@@ -98,7 +98,7 @@ const PersistentBotChat: React.FC<PersistentBotChatProps> = ({
                 accessibilityLabel="Voice input"
                 accessibilityRole="button"
               >
-                <Text style={styles.voiceIcon}>🎤</Text>
+                <Text style={styles.voiceIcon} allowFontScaling={false}>🎤</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.sendButton}
@@ -152,8 +152,8 @@ const styles = StyleSheet.create({
   },
   headerText: {
     flex: 1,
-    fontSize: theme.fonts.sizes.medium,
-    fontWeight: '600',
+    fontSize: theme.typography.fontSize.md,
+    fontWeight: theme.typography.fontWeight.semibold,
     color: theme.colors.text,
   },
   expandIcon: {
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   },
   botText: {
     flex: 1,
-    fontSize: theme.fonts.sizes.medium,
+    fontSize: theme.typography.fontSize.md,
     color: theme.colors.text,
     marginLeft: theme.spacing.xs,
   },
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    fontSize: theme.fonts.sizes.medium,
+    fontSize: theme.typography.fontSize.md,
     color: theme.colors.text,
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.sm,
@@ -223,8 +223,8 @@ const styles = StyleSheet.create({
   },
   sendText: {
     color: theme.colors.background,
-    fontSize: theme.fonts.sizes.medium,
-    fontWeight: '600',
+    fontSize: theme.typography.fontSize.md,
+    fontWeight: theme.typography.fontWeight.semibold,
   },
 });
 

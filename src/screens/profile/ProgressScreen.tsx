@@ -1,12 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 
 const ProgressScreen: React.FC = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Your Progress 📊</Text>
-      <Text style={styles.subtitle}>See how you're growing and improving</Text>
-    </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        <Text style={styles.title} allowFontScaling={false}>Your Progress 📊</Text>
+        <Text style={styles.subtitle} allowFontScaling={false}>See how you're growing and improving</Text>
+        
+        {/* Progress content will be added here */}
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -17,6 +21,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 24,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontSize: 28,

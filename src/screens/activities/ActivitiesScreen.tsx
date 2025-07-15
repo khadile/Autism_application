@@ -7,8 +7,8 @@ import {
   StyleSheet,
   SafeAreaView,
 } from 'react-native';
-import { theme } from '../constants/theme';
-import PersistentBotChat from '../components/PersistentBotChat';
+import { theme } from '../../constants/theme';
+import PersistentBotChat from '../../components/PersistentBotChat';
 
 interface Activity {
   id: string;
@@ -97,7 +97,7 @@ const ActivitiesScreen: React.FC = () => {
           accessibilityLabel="Profile"
           accessibilityRole="button"
         >
-          <Text style={styles.headerIcon}>👤</Text>
+          <Text style={styles.headerIcon} allowFontScaling={false}>👤</Text>
           <Text style={styles.headerButtonText}>Profile</Text>
         </TouchableOpacity>
         
@@ -109,7 +109,7 @@ const ActivitiesScreen: React.FC = () => {
           accessibilityLabel="Home"
           accessibilityRole="button"
         >
-          <Text style={styles.headerIcon}>🏠</Text>
+          <Text style={styles.headerIcon} allowFontScaling={false}>🏠</Text>
           <Text style={styles.headerButtonText}>Home</Text>
         </TouchableOpacity>
       </View>
@@ -132,7 +132,7 @@ const ActivitiesScreen: React.FC = () => {
             >
               <View style={styles.activityContent}>
                 <View style={[styles.activityIconContainer, { backgroundColor: activity.color }]}>
-                  <Text style={styles.activityIcon}>{activity.icon}</Text>
+                  <Text style={styles.activityIcon} allowFontScaling={false}>{activity.icon}</Text>
                 </View>
                 
                 <View style={styles.activityTextContainer}>
@@ -194,8 +194,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   headerTitle: {
-    fontSize: theme.fonts.sizes.large,
-    fontWeight: 'bold',
+    fontSize: theme.typography.fontSize.lg,
+    fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.text,
     textAlign: 'center',
   },
@@ -242,15 +242,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   activityTitle: {
-    fontSize: theme.fonts.sizes.medium,
-    fontWeight: 'bold',
+    fontSize: theme.typography.fontSize.md,
+    fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.text,
     textAlign: 'center',
     marginBottom: 2,
   },
   activitySubtitle: {
-    fontSize: theme.fonts.sizes.small,
-    color: theme.colors.textSecondary,
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.textLight,
     textAlign: 'center',
   },
   playButtonContainer: {
@@ -267,8 +267,8 @@ const styles = StyleSheet.create({
   },
   playButtonText: {
     color: theme.colors.background,
-    fontSize: theme.fonts.sizes.medium,
-    fontWeight: '600',
+    fontSize: theme.typography.fontSize.md,
+    fontWeight: theme.typography.fontWeight.semibold,
   },
   bottomPadding: {
     height: 80, // Space for persistent chat
